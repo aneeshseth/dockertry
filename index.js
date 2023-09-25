@@ -8,10 +8,28 @@ const Docker = require('dockerode')
 
 app.get('/', async (req, res) => {
   try {
-    const docker = new Docker({ socketPath: '/var/lib/docker.sock' })
+    const docker = new Docker({ socketPath: '/var/run/docker.sock' })
     //const filePathInsideContainer = '/home/node/app/myfile.txt'
-    const container = await docker.getContainer('d09c38fff662');
+    const container = await docker.getContainer('aneeshseth/simp');
     console.log(container)
+   console.log("check one")
+    const exec = await container.exec({Cmd: ['shasum', '-'], AttachStdin: true, AttachStdout: true})
+    console.log("check 2" + exec) 
+    const stream = await exec.start()
+    res.sendStatus(200)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send('Failed to add course');
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
+
+
+
+    /*
     await container.exec(
         (err, exec) => {
             console.log("EXEC")
@@ -22,14 +40,4 @@ app.get('/', async (req, res) => {
           }
           console.log(exec)
     })
-    res.sendStatus(200)
-  } catch (error) {
-    res.status(500).send('Failed to add course');
-  }
-});
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
-
-
+    */
